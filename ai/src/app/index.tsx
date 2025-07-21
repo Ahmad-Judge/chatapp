@@ -11,7 +11,7 @@ const BeautifulChatApp = () => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const { user } = useUser();
 const [isPro, setIsPro] = useState(false);
 
@@ -32,7 +32,7 @@ useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (!input.trim()) return;
 
@@ -65,6 +65,15 @@ useEffect(() => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleInputKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSubmit(e);
+    }
+  };
+  const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    handleSubmit(e);
   };
 
   const handleRefresh = () => {
@@ -274,18 +283,14 @@ useEffect(() => {
               <input
                 type="text"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={e => setInput(e.target.value)}
+                onKeyPress={handleInputKeyPress}
+                className="flex-1 bg-transparent outline-none px-4 py-3 text-lg"
                 placeholder="Type your message..."
-                className={`flex-1 px-6 py-4 rounded-2xl outline-none transition-all duration-300 ${
-                  darkMode 
-                    ? 'bg-transparent text-white placeholder-gray-400' 
-                    : 'bg-transparent text-gray-200 placeholder-gray-400'
-                }`}
                 disabled={loading}
-                onKeyPress={(e) => e.key === 'Enter' && handleSubmit(e)}
               />
               <button
-                onClick={handleSubmit}
+                onClick={handleButtonClick}
                 disabled={loading || !input.trim()}
                 className="m-2 p-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
